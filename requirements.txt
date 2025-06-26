@@ -1,0 +1,37 @@
+# -------------------------------------------------
+# 城市交通舆情意图识别系统 - 项目依赖
+# -------------------------------------------------
+
+# --- 核心深度学习与NLP库 ---
+# PyTorch: 核心深度学习框架
+torch
+torchvision
+
+# Hugging Face 生态系统
+transformers  # 用于加载模型和分词器
+datasets      # 用于加载和处理数据
+accelerate    # 用于加速训练流程
+
+# 部分分词器需要的底层依赖
+sentencepiece
+protobuf
+
+# --- 数据科学与工具库 ---
+# 数据处理与分析
+pandas
+numpy
+
+# 模型评估与数据划分
+scikit-learn
+
+# 数据可视化
+matplotlib
+seaborn
+
+# --- Web应用与Demo库 ---
+# 快速构建交互式Web应用
+streamlit
+
+# --- (可选) Jupyter Notebook 环境支持 ---
+# 如果你在Jupyter Notebook或VS Code的Notebook中运行，建议安装此包
+# ipykernel
