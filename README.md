@@ -1,2 +1,2 @@
 # NLP_TPnews
-A project  about Urban Traffic Public Opinion Intent Recognition System
+A project  about Urban Traffic Public Opinion Intent Recognition System using NLP
