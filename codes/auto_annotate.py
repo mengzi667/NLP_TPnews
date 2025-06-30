@@ -22,39 +22,67 @@ client = OpenAI(
     base_url="https://dashscope.aliyuncs.com/compatible-mode/v1"
 )
 LLM_MODEL_NAME = "qwen-turbo"
-INPUT_CSV_PATH = "上海地铁_data.csv" # TODO: 确认这是你采集到的数据文件名
-OUTPUT_CSV_PATH = "qwen_labeled_data_v2.csv" # 建议用新名字以区分版本
+INPUT_CSV_PATH = "data/weibo_data_master.csv"
+OUTPUT_CSV_PATH = "data/qwen_labeled_data.csv"
 TEXT_COLUMN = "text"
 NEW_LABEL_COLUMN = "qwen_label"
 SAVE_INTERVAL = 50 
 
 # --- 3. Prompt模板 ---
-PROMPT_TEMPLATE = """你是一位精通政务服务和城市管理的意图分类专家。你的任务是先对用户输入的文本进行一步步的分析，理解其核心意图，然后再将其严格归类到以下六个预设类别中。你的回答必须只能是这些类别中的一个，不要添加任何解释或多余的文字。
+PROMPT_TEMPLATE = """你是一位逻辑严谨、经验丰富的城市交通领域舆情分析专家。你的任务是深入理解用户在社交媒体上发布的关于交通问题的真实意图，然后从【类别选项】中选择最恰当的一个作为输出。
 
-类别选项:
-- 咨询 (Consultation): 公民对政策、办事流程等信息的询问。例如：“请问如何办理公交卡？”、“末班车是几点？”
-- 求助 (Request for Help): 公民在生活中遇到困难或意外，请求提供非紧急救助。例如：“我的钱包好像掉在车上了，怎么办？”、“小孩走丢了，谁能帮帮我。”
-- 投诉 (Complaint): 公民对管理、服务、产品等方面表达强烈不满。例如：“你们这个安检效率也太低了！搞什么呢？”、“上海地铁空调能把人冻死，完全不考虑乘客感受！”
-- 举报 (Report): 公民向有关部门揭发违法违规行为或安全隐患。例如：“有人在车厢里抽烟，没人管。”、“我看到有人翻越闸机逃票。”
-- 建议 (Suggestion): 公民对城市管理、社会治理等方面提出具体的改进方案。例如：“建议早高峰期间增开几班车。”、“希望延长11号线的夜间运营时间。”
-- 其他 (Other): 不属于以上任何类别的情绪表达、闲聊、广告或无明确意图的文本。例如：“今天天气真好。”、“上班打卡。”
+在做决定时，请在“内心”里遵循以下思考路径：
+1.  首先，分析文本的核心内容和潜在情感倾向（正面、负面、中性）。
+2.  然后，逐一比对【类别选项】中的六个核心意图，判断文本是否主要符合其中某个类别的定义。
+3.  最后，仅当文本不明确属于以上任何一个核心类别时，才将其归类为“其他”。
 
+你的最终回答【必须】严格为【类别选项】中的一个词或词组，不要添加任何标点、数字、解释或多余的文字。
+
+## 类别选项
+* 咨询 (Consultation): 询问关于交通的客观信息，如政策、价格、路线、时刻等。
+  例如：“请问从浦东机场到市区坐哪路公交最方便？”、“网约车开发票的流程是什么？”
+
+* 求助 (Request for Help): 描述自己遇到的具体困难，请求帮助。
+  例如：“我的交通卡掉在出租车上了，该联系谁？”、“这辆哈啰单车扫码后开不了锁，怎么办？”
+
+* 投诉 (Complaint): 对服务、设施、管理等表达强烈不满，通常带有负面情绪。
+  例如：“上海地铁的空调是打算把人冻死吗？”、“那个滴滴司机态度太差了，还故意绕路！”
+
+* 举报 (Report): 揭发一个具体、正在发生的违规行为或安全隐患。
+  例如：“举报这辆牌号为沪AX****的出租车不打表。”、“有人在公交车上抽烟，没人管。”
+
+* 建议 (Suggestion): 提出具体的改进方案或想法。
+  例如：“我建议你们在早高峰期间加密9号线的班次。”、“希望能在所有地铁站增加更多的休息座椅。”
+
+* 正面反馈 (Positive Feedback): 对服务、人员、设施等表达明确的赞扬、感谢或满意。
+  例如：“今天遇到的公交司机师傅超有耐心，为他点赞！”、“共享单车的调度快了很多，很方便。”
+
+* 其他 (Other): 不属于以上任何类别。例如，纯粹的事实陈述、无明确意图的个人感想、闲聊或广告。
+  例如：“今天路上好堵啊。”、“又是奔波在地铁上的一天。”
+
+## 用户输入
 用户文本: "{text}"
 
-分类结果:"""
+## 分类结果"""
 
 
 # --- 4. API调用函数 ---
+
 def get_label_from_llm(text_input, llm_client, model_name):
-    """使用OpenAI兼容的客户端调用大模型获取标签。"""
+    """使用OpenAI兼容的客户端调用大模型获取【单个】分类标签。"""
+    
     full_prompt = PROMPT_TEMPLATE.format(text=text_input)
+    
     try:
         response = llm_client.chat.completions.create(
             model=model_name,
             messages=[{"role": "user", "content": full_prompt}],
-            temperature=0.0,
+            temperature=0.0, # 温度设为0，追求最稳定、最符合指令的输出
         )
-        return response.choices[0].message.content.strip()
+        
+        label = response.choices[0].message.content.strip()
+        return label
+
     except Exception as e:
         print(f"\nAPI调用时发生错误: {e}")
         return "API_ERROR"

@@ -1,0 +1,9 @@
+{
+    "workbench.editorAssociations": {
+        "*.copilotmd": "vscode.markdown.preview.editor",
+        "*.pdf": "pdf.preview",
+        "*.docx": "docxreader.docxEditor",
+        "file:/**/*.csv": "jupyter-data-wrangler",
+        "*.csv": "default"
+    }
+}
