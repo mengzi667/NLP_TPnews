@@ -9,18 +9,18 @@ import os
 
 # --- 1. 配置区域 ---
 
-API_URL = "https://m.weibo.cn/api/container/getIndex?containerid=100103type%3D1%26q%3D%E4%B8%8A%E6%B5%B7%E5%9C%B0%E9%93%81+-%E6%96%B0%E9%97%BB&page_type=searchall"
+API_URL = "https://m.weibo.cn/api/container/getIndex?containerid=100103type%3D1%26q%3D%E5%8C%97%E4%BA%AC%E5%9C%B0%E9%93%81&page_type=searchall"
 
 # TODO: (必须替换) 每次运行前，从浏览器F12开发者工具中获取最新的Cookie
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36',
-    'Cookie': 'WEIBOCN_FROM=1110006030; BAIDU_SSP_lcr=https://www.google.com/; _T_WM=79542187288; XSRF-TOKEN=40295d; mweibo_short_token=20193f73f0; MLOGIN=0; M_WEIBOCN_PARAMS=fid%3D100103type%253D1%2526q%253D%25E4%25B8%258A%25E6%25B5%25B7%25E5%259C%25B0%25E9%2593%2581%2B-%25E6%2596%25B0%25E9%2597%25BB%26uicode%3D10000011', # 请务必替换成你自己的完整、最新Cookie！
+    'Cookie': 'WEIBOCN_FROM=1110006030; BAIDU_SSP_lcr=https://www.google.com/; _T_WM=74840181522; MLOGIN=0; XSRF-TOKEN=f98e84; mweibo_short_token=0bcfcbb134; M_WEIBOCN_PARAMS=luicode%3D10000011%26lfid%3D100103type%253D61%2526q%253D%25E5%258C%2597%25E4%25BA%25AC%25E5%259C%25B0%25E9%2593%2581%2526t%253D%26fid%3D100103type%253D1%2526q%253D%25E5%258C%2597%25E4%25BA%25AC%25E5%259C%25B0%25E9%2593%2581%26uicode%3D10000011', # 请务必替换成你自己的完整、最新Cookie！
     'Accept': 'application/json, text/plain, */*',
     'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
     'Connection': 'keep-alive',
     'MWeibo-Pwa': '1',
     'X-Requested-With': 'XMLHttpRequest',
-    'X-XSRF-TOKEN': '40295d',
+    'X-XSRF-TOKEN': 'f98e84',
 }
 
 # --- 2. 智能过滤器函数 ---
@@ -40,7 +40,7 @@ def is_high_quality_ugc(text, username):
     if username in official_accounts:
         return False
     # 规则4：屏蔽过短的文本
-    if len(text.strip()) < 10:
+    if len(text.strip()) < 5:
         return False
     return True
 
@@ -103,7 +103,53 @@ def scrape_weibo_data(keyword, pages_to_scrape=10, start_page=1):
 # --- 4. 智能执行与保存逻辑 ---
 if __name__ == '__main__':
     # --- 任务配置 ---
-    SEARCH_KEYWORD = "上海 网约车"
+    KEYWORDS_TO_SCRAPE = "南京地铁"
+    # "北京地铁",
+    # "北京公交",
+    # "北京出租车",
+    # "北京网约车",
+    # "北京共享单车",
+    
+    # # --- 建议 (Suggestion) ---
+    # # 目标：采集用户提出的具体改进意见
+    # "北京地铁 建议",
+    # "北京公交 建议",
+    # "北京出租车 建议",
+    # "北京网约车 建议",
+    # "北京共享单车 建议",
+
+    # # --- 咨询 (Consultation) ---
+    # # 目标：采集用户对信息、流程、价格的询问
+    # "请问 上海地铁",
+    # "请问 上海公交",
+    # "请问 上海出租车",
+    # "请问 上海网约车",
+    # "请问 上海共享单车",
+
+    # # --- 求助 (Request for Help) ---
+    # # 目标：采集用户遇到的具体困难和失物求助
+    # "上海地铁 怎么办",
+    # "上海公交 怎么办",
+    # "上海出租车 怎么办",
+    # "上海网约车 怎么办",
+    # "上海共享单车 怎么办",
+
+    # # --- 举报 (Report) ---
+    # # 目标：采集用户对违规行为和安全隐患的揭发
+    # "举报 上海地铁",
+    # "举报 上海公交",
+    # "举报 上海出租车",
+    # "举报 上海网约车",
+    # "举报 上海共享单车",
+
+    # # --- 正面反馈 (Positive Feedback) ---
+    # # 目标：采集用户明确的表扬和感谢
+    # "感谢 上海地铁",
+    # "感谢 上海公交",
+    # "感谢 上海出租车",
+    # "感谢 上海网约车",
+    # "感谢 上海共享单车",
+
     OUTPUT_FILENAME = "data/weibo_data_master.csv"
 
     # --- 本次运行的参数 ---
@@ -114,10 +160,10 @@ if __name__ == '__main__':
     PAGES_TO_SCRAPE = 100
 
     print(f"--- 开始批次采集任务 ---")
-    print(f"关键词: '{SEARCH_KEYWORD}', 计划采集页码: {START_PAGE} 到 {START_PAGE + PAGES_TO_SCRAPE - 1}")
+    print(f"关键词: '{KEYWORDS_TO_SCRAPE}', 计划采集页码: {START_PAGE} 到 {START_PAGE + PAGES_TO_SCRAPE - 1}")
     
     # 执行采集，获取本次运行的新数据
-    df_new_data = scrape_weibo_data(SEARCH_KEYWORD, PAGES_TO_SCRAPE, START_PAGE)
+    df_new_data = scrape_weibo_data(KEYWORDS_TO_SCRAPE, PAGES_TO_SCRAPE, START_PAGE)
     
     if df_new_data is None or df_new_data.empty:
         print("本次运行未能采集到任何新的有效数据。任务结束。")
