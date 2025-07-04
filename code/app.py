@@ -198,7 +198,8 @@ else:
                         color_continuous_scale='Blues'
                     )
                     fig.update_layout(
-                        yaxis={'categoryorder':'total ascending'},
+                        yaxis={'categoryorder':'total ascending', 'showgrid': False, 'title': ""},
+                        xaxis={'showgrid': True, 'gridcolor': 'rgba(0,0,0,0.1)', 'title': ""},
                         height=350,
                         showlegend=False,
                         title_x=0.5,
@@ -208,8 +209,6 @@ else:
                         margin=dict(l=20, r=20, t=40, b=20)
                     )
                     fig.update_traces(textposition='outside')
-                    fig.update_xaxis(showgrid=True, gridcolor='rgba(0,0,0,0.1)', title="")
-                    fig.update_yaxis(showgrid=False, title="")
                     st.plotly_chart(fig, use_container_width=True)
 
                 with result_col2:
