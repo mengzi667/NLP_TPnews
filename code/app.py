@@ -144,5 +144,4 @@ st.sidebar.info(
 )
 st.sidebar.markdown("---")
 st.sidebar.write("**开发者:** 潘禹萌 秦赫")
-# TODO: 替换成你自己的GitHub项目链接
 st.sidebar.write("**GitHub:** [https://github.com/mengzi667/NLP_TPnews](https://github.com/mengzi667/NLP_TPnews)")
