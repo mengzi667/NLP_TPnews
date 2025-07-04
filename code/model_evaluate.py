@@ -11,11 +11,11 @@ import sys
 
 # --- 1. 配置区域 ---
 # MODEL_CHECKPOINT_PATH = "./roberta_hyper_search_results/run-18/checkpoint-537"
-MODEL_CHECKPOINT_PATH = "./roberta_hyper_search_results/run-18/checkpoint-537"
+MODEL_CHECKPOINT_PATH = "./models/mac_hyper_search_results/run-11/checkpoint-716"
 DATA_DIR = "data/final_split/"
 TEXT_COLUMN = "text"
 ORIGINAL_LABEL_COLUMN = "qwen_label" # <-- 【修正点】使用CSV文件中真实的列名
-OUTPUT_DIR = "./evaluation_results/roberta_best_model"
+OUTPUT_DIR = "./evaluation_results/mac_best_model"
 
 # --- 2. 主逻辑 ---
 if __name__ == "__main__":

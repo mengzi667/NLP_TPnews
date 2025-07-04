@@ -23,6 +23,7 @@ scikit-learn
 
 # 数据可视化
 matplotlib
+plotly
 seaborn
 
 # 命令行进度条
