@@ -11,8 +11,7 @@ st.set_page_config(
     page_title="城市交通舆情意图识别系统",
     page_icon="🚇",
     layout="wide",
-    initial_sidebar_state="expanded",
-    theme="light"
+    initial_sidebar_state="expanded"
 )
 
 # --- 2. 加载模型 ---
