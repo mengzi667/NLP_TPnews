@@ -1,0 +1,30 @@
+# 忽略Python和环境相关的缓存/文件夹
+__pycache__/
+*.pyc
+.env
+/NLP_TPnews/
+/nlp_final_env/
+/venv/
+
+# 忽略IDE和系统配置文件
+.vscode/
+.idea/
+.DS_Store
+
+# 忽略所有数据文件
+# 这会忽略data文件夹和所有散落在项目里的csv文件
+data/
+*.csv
+
+# 忽略所有模型、日志、评估结果
+# 'model_results*' 会匹配 model_results_baseline, model_results_weighted 等所有相关文件夹
+models/
+evaluation_results/
+logs/
+
+# 忽略任何其他大文件或压缩包
+*.pth
+*.safetensors
+*.bin
+*.zip
+*.gz

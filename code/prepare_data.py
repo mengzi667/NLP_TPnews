@@ -5,8 +5,8 @@ import sys
 
 # --- 1. 配置区域 ---
 
-# 输入文件：这是你用LLM标注好的、包含所有类别的完整文件
-INPUT_FILE = "data/qwen_labeled_data_final.csv"
+# 输入文件：人工核验后的LLM标注好的、包含所有类别的完整文件，
+INPUT_FILE = "data\data_manual_checked.csv"
 
 # 输出目录：存放最终划分好的三个文件的位置
 OUTPUT_DIR = "data/final_split"
