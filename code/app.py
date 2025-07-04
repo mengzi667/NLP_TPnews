@@ -12,34 +12,32 @@ st.set_page_config(
     page_title="城市交通舆情意图识别系统",
     page_icon="🚇",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="expanded"
 )
 
 # --- 2. 加载模型 (Model Loading) ---
 # 使用 @st.cache_resource 装饰器来缓存模型，避免每次刷新页面都重新加载
-# 这会极大地提升应用的响应速度
 @st.cache_resource
 def load_model():
     """
-    加载本地训练好的模型和分词器。
+    从Hugging Face Hub加载训练好的模型和分词器。
     这个函数只会在第一次运行时执行，之后的结果会被缓存。
     """
-    # TODO: (非常重要!) 将这里的路径替换为你最终的、性能最好的那个模型checkpoint的路径
-    # 例如: "./model_results_weighted/checkpoint-1611"
-    model_path = "./models/mac_hyper_search_results/run-11/checkpoint-716" 
+    # TODO: (非常重要!) 将这里的ID替换为你自己在Hugging Face Hub上的模型ID
+    # 格式通常是 "你的用户名/你的模型名"
+    model_id = "Mengzi667/macbert-traffic-intent-classifier"
 
     try:
-        # 检查路径是否存在
-        if not os.path.exists(model_path):
-            st.error(f"错误：找不到模型路径 '{model_path}'。请确认路径是否正确。")
-            return None, None
-            
-        tokenizer = AutoTokenizer.from_pretrained(model_path)
-        model = AutoModelForSequenceClassification.from_pretrained(model_path)
-        print("模型和分词器加载成功！")
+        st.info(f"正在从Hugging Face Hub加载模型: {model_id} ...")
+        tokenizer = AutoTokenizer.from_pretrained(model_id)
+        model = AutoModelForSequenceClassification.from_pretrained(model_id)
+        st.success("模型和分词器加载成功！")
         return tokenizer, model
     except Exception as e:
-        st.error(f"模型加载失败，请检查路径是否为有效的Hugging Face模型目录。")
+        st.error(f"从Hugging Face Hub加载模型失败。请确认：")
+        st.error(f"1. 模型ID '{model_id}' 是否正确。")
+        st.error(f"2. 你的模型仓库是否已设为公开。")
+        st.error(f"3. 网络连接是否正常。")
         st.error(f"错误详情: {e}")
         return None, None
 
@@ -57,7 +55,7 @@ st.markdown("---")
 
 # --- 4. 主应用界面 (Main Interface) ---
 if model is None:
-    st.warning("模型未能成功加载，应用无法正常工作。请检查终端中的错误信息。")
+    st.warning("模型未能成功加载，应用无法正常工作。请检查终端或部署日志中的错误信息。")
 else:
     col1, col2 = st.columns([2, 1]) # 创建两列，左边更宽
 
@@ -112,46 +110,31 @@ else:
                 st.markdown("---")
                 st.header("📈 分析结果")
                 
-                # 分两列展示
                 res_col1, res_col2 = st.columns(2)
                 
                 with res_col1:
-                    # 使用st.metric展示最可能的类别
                     st.metric(
                         label="**最高概率意图**", 
                         value=prob_df.iloc[0]['意图类别'],
                         help=f"模型认为这条文本最有可能属于这个类别，置信度为 {prob_df.iloc[0]['概率']:.2%}"
                     )
                     st.write("详细概率分布：")
-                    # 使用st.dataframe展示带进度条的表格
                     st.dataframe(prob_df,
                                   use_container_width=True,
                                   column_config={
                                       "概率": st.column_config.ProgressColumn(
-                                          "概率",
-                                          format="%.2f%%",
-                                          min_value=0,
-                                          max_value=1,
+                                          "概率", format="%.2f%%", min_value=0, max_value=1,
                                       ),
                                   },
                                   hide_index=True)
 
                 with res_col2:
-                    # 使用Plotly绘制漂亮的条形图
                     fig = px.bar(
-                        prob_df, 
-                        x='概率', 
-                        y='意图类别', 
-                        orientation='h', 
-                        title='各意图类别概率分布图',
-                        text_auto='.2%',
+                        prob_df, x='概率', y='意图类别', orientation='h', 
+                        title='各意图类别概率分布图', text_auto='.2%',
                         color_discrete_sequence=px.colors.sequential.Blues_r
                     )
-                    fig.update_layout(
-                        yaxis={'categoryorder':'total ascending'},
-                        xaxis_title="概率",
-                        yaxis_title="意图类别"
-                    )
+                    fig.update_layout(yaxis={'categoryorder':'total ascending'}, xaxis_title="概率", yaxis_title="意图类别")
                     st.plotly_chart(fig, use_container_width=True)
 
 # --- 6. 侧边栏 (Sidebar) ---
@@ -161,13 +144,14 @@ st.sidebar.info(
     这是一个端到端的NLP项目，旨在通过AI技术赋能城市交通管理，自动分析海量社情民意，提升响应效率。
     
     **核心技术栈:**
-    - **数据工程:** `requests`, `BeautifulSoup`, `pandas`
-    - **智能标注:** LLM API (`通义千问`), `Prompt Engineering`
+    - **智能标注:** LLM API (`通义千问`), Prompt Engineering
     - **模型训练:** `PyTorch`, `Hugging Face Transformers`
-    - **基座模型:** `hfl/chinese-macbert-base`
+    - **模型选型:** `MacBERT` vs `RoBERTa` (A/B Test)
+    - **性能优化:** 类别加权, 超参数搜索 (`Optuna`)
     - **应用构建:** `Streamlit`, `Plotly`
     """
 )
 st.sidebar.markdown("---")
 st.sidebar.write("**开发者:** 潘禹萌 秦赫")
-st.sidebar.write("**GitHub:** https://github.com/mengzi667/NLP_TPnews.git")
+# TODO: 替换成你自己的GitHub项目链接
+st.sidebar.write("**GitHub:** [https://github.com/mengzi667/NLP_TPnews](https://github.com/mengzi667/NLP_TPnews)")
