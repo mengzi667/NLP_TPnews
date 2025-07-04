@@ -4,8 +4,6 @@ import torch
 import torch.nn.functional as F
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
-import os
 
 # --- 1. 页面配置 ---
 st.set_page_config(
@@ -48,6 +46,23 @@ st.markdown("""
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         border: 1px solid #e5e7eb;
         margin-bottom: 1rem;
+    }
+    
+    /* 文本输入框样式 */
+    .stTextArea > div > div > textarea {
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 12px;
+        font-size: 14px;
+        line-height: 1.5;
+        background-color: #fafafa;
+        transition: all 0.3s ease;
+    }
+    
+    .stTextArea > div > div > textarea:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        background-color: white;
     }
     
     /* 意图类别标签样式 */
@@ -145,25 +160,24 @@ else:
         "咨询": "文本的核心是一个信息问询，用户希望获得一个客观的答案。",
         "求助": "这是一个明确的求助信号，通常与个人遇到的具体困难（如失物）相关。",
         "举报": "模型识别出了对某个具体违规行为或安全隐患的揭发，需要相关部门关注。",
-        "正面反馈 (Positive Feedback)": "文本表达了明确的赞扬或感谢，是提升服务信心的重要来源。",
+        "正面反馈": "文本表达了明确的赞扬或感谢，是提升服务信心的重要来源。",
     }
 
     # 简化的单列布局
     st.markdown("### 📝 文本分析")
     
-    # 自定义输入框样式
-    with st.container():
-        st.markdown('<div class="custom-card">', unsafe_allow_html=True)
-        with st.form("intent_form", clear_on_submit=False):
-            text_input = st.text_area(
-                "请输入要分析的文本:",
-                value="强烈建议地铁11号线在早高峰增加几班车，现在等一趟的时间也太长了！",
-                height=120,
-                placeholder="例如：上海地铁的空调是打算把人冻死吗？",
-                help="💡 咨询 | 🆘 求助 | 😤 投诉 | 🚨 举报 | 💡 建议 | 👍 正面反馈"
-            )
-            submitted = st.form_submit_button("🚀 开始智能分析", use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
+    # 文本输入区域
+    st.markdown("**请输入您要分析的交通相关文本：**")
+    with st.form("intent_form", clear_on_submit=False):
+        text_input = st.text_area(
+            label="文本内容",
+            value="强烈建议地铁11号线在早高峰增加几班车，现在等一趟的时间也太长了！",
+            height=120,
+            placeholder="例如：上海地铁的空调是打算把人冻死吗？\n或者：请问地铁末班车是几点？",
+            help="💬 咨询 | 🆘 求助 | 😤 投诉 | 🚨 举报 | 💡 建议 | 👍 正面反馈",
+            label_visibility="collapsed"
+        )
+        submitted = st.form_submit_button("🚀 开始智能分析", use_container_width=True)
 
     # --- 6. 模型推理与结果展示 ---
     if submitted:
@@ -199,18 +213,16 @@ else:
                     )
                     fig.update_layout(
                         yaxis={'categoryorder':'total ascending', 'showgrid': False, 'title': ""},
-                        xaxis={'showgrid': True, 'gridcolor': 'rgba(0,0,0,0.1)', 'title': ""},
                         height=350,
                         showlegend=False,
                         title_x=0.5,
                         plot_bgcolor='rgba(0,0,0,0)',
                         paper_bgcolor='rgba(0,0,0,0)',
                         font=dict(size=12),
-                        margin=dict(l=20, r=20, t=40, b=20)
+                        margin=dict(l=20, r=20, t=40, b=20),
+                        xaxis=dict(showgrid=True, gridcolor='rgba(0,0,0,0.1)', title="")
                     )
                     fig.update_traces(textposition='outside')
-                    st.plotly_chart(fig, use_container_width=True)
-
                 with result_col2:
                     # 结果卡片
                     top_prediction = prob_df.iloc[0]
