@@ -15,7 +15,7 @@
 
 **[➡️ 点击这里，立即体验！](https://nlp-tpnews.streamlit.app/)**
 
-![alt text](image.png)
+![alt text](data\image.png)
 
 ---
 
@@ -47,7 +47,7 @@
 * **宏平均 F1-Score: 89.7%**
 * **总体准确率 (Accuracy): 94.7%**
 
-![最终混淆矩阵](output\evaluation_results\mac_best_model\confusion_matrix.png)
+![最终混淆矩阵](data\confusion_matrix.png)
 
 ---
 
