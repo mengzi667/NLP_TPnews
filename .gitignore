@@ -17,8 +17,9 @@ data/
 
 # 忽略所有模型、日志、评估结果
 # 'model_results*' 会匹配 model_results_baseline, model_results_weighted 等所有相关文件夹
-models/
-evaluation_results/
+src/
+output/
+Temp/
 logs/
 
 # 忽略任何其他大文件或压缩包
