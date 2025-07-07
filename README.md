@@ -78,7 +78,7 @@ cd NLP_TPnews
 ```
 
 **3. 创建并激活Conda环境:**
-本项目推荐使用Conda进行环境管理。以下命令会创建一个名为`nlp_app`的、使用Python 3.10的干净环境。
+本项目推荐使用Conda进行环境管理。以下命令会创建一个名为`nlp_app`的、使用Python 3.10+的干净环境。
 ```bash
 conda create -n nlp_app python=3.12
 conda activate nlp_app
